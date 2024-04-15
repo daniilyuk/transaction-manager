@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  app:
+    image: 'transaction_manager'
+    build:
+      context: .
+    container_name: app
+    depends_on:
+      - db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=post21
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/transaction_manager
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=post21
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create
+    ports:
+      - "8080:8080"
+
+  db:
+    image: postgres
+    container_name: db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=post21
+      - POSTGRES_DB=transaction_manager
+    ports:
+      - "5432:5432"
