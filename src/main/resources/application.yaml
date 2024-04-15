@@ -6,6 +6,10 @@ spring:
     username: postgres
     password: post21
     url: jdbc:postgresql://localhost:5432/transaction_manager
+  flyway:
+    locations: "classpath:db/migration"
+    enabled: true
+    baseline-on-migrate: true
 api:
   key: 9c906a06a172473aa45cceef364a77d1
 rest:
