@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: Bank Transaction Manager
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: post21
+    url: jdbc:postgresql://localhost:5432/transaction_manager
+api:
+  key: 9c906a06a172473aa45cceef364a77d1
+rest:
+  endpoints:
+    - name: time_series
+      uri: https://api.twelvedata.com/time_series
+    - name: exchange_rate
+      uri: https://api.twelvedata.com/exchange_rate
+
