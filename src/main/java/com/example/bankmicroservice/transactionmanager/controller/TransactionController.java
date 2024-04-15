@@ -14,11 +14,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 @RestController
 @RequestMapping(ApiConstants.PREFIX)
 public class TransactionController {
     private final TransactionService transactionService;
     private final TransactionMapper transactionMapper;
+    private final ExecutorService executor = Executors.newFixedThreadPool(10);
 
     public TransactionController(TransactionService transactionService) {
         this.transactionService = transactionService;
@@ -31,7 +36,12 @@ public class TransactionController {
         transactionDto.setCurrencyShortName(CurrencyShortName.valueOf(request.getCurrencyShortName()));
         transactionDto.setExpenseCategory(ExpenseCategory.valueOf(request.getExpenseCategory()));
 
-        transactionService.createTransaction(transactionDto);
+        CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+            transactionService.createTransaction(transactionDto);
+        }, executor);
+
+        future.join();
+
         return ResponseEntity.ok(HttpStatus.CREATED);
     }
 }

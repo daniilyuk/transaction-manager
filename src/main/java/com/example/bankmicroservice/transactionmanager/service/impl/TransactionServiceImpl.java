@@ -9,8 +9,6 @@ import com.example.bankmicroservice.transactionmanager.entity.Currency;
 import com.example.bankmicroservice.transactionmanager.entity.Limit;
 import com.example.bankmicroservice.transactionmanager.entity.Transaction;
 import com.example.bankmicroservice.transactionmanager.mapper.AccountMapper;
-import com.example.bankmicroservice.transactionmanager.mapper.LimitMapper;
-import com.example.bankmicroservice.transactionmanager.mapper.TransactionMapper;
 import com.example.bankmicroservice.transactionmanager.repository.AccountRepository;
 import com.example.bankmicroservice.transactionmanager.repository.CurrencyRepository;
 import com.example.bankmicroservice.transactionmanager.repository.LimitRepository;
@@ -24,7 +22,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
@@ -36,8 +33,6 @@ public class TransactionServiceImpl implements TransactionService {
     private final CurrencyRepository currencyRepository;
     private final LimitService limitService;
     private final CurrencyService currencyService;
-    private final TransactionMapper transactionMapper;
-    private final LimitMapper limitMapper;
     private final ModelMapper modelMapper;
     private final AccountMapper accountMapper;
     private final BigDecimal DEFAULT_LIMIT=new BigDecimal(1000);
@@ -54,9 +49,7 @@ public class TransactionServiceImpl implements TransactionService {
         this.limitService = limitService;
         this.currencyService = currencyService;
         this.modelMapper = new ModelMapper();
-        this.limitMapper = LimitMapper.INSTANCE;
         this.accountMapper = AccountMapper.INSTANCE;
-        this.transactionMapper = TransactionMapper.INSTANCE;
     }
 
 
@@ -108,11 +101,6 @@ public class TransactionServiceImpl implements TransactionService {
 
             transaction.setAccountFrom(account);
         } else {
-//            List<Limit> limits = limitRepository
-//                    .findLimitByAccountAndCategory(accountFrom, transactionDto.getExpenseCategory().name())
-//                    .stream()
-//                    .sorted(Comparator.comparing(Limit::getLimitDatetime))
-//                    .toList();
 
             assert accountTo != null;
             limit=limitRepository
