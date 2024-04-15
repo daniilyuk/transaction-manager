@@ -1,6 +1,6 @@
 package com.example.bankmicroservice.transactionmanager.service.impl;
 
-import com.example.bankmicroservice.transactionmanager.dto.*;
+import com.example.bankmicroservice.transactionmanager.dto.LimitDto;
 import com.example.bankmicroservice.transactionmanager.entity.Account;
 import com.example.bankmicroservice.transactionmanager.entity.Currency;
 import com.example.bankmicroservice.transactionmanager.entity.Limit;
@@ -12,18 +12,14 @@ import com.example.bankmicroservice.transactionmanager.repository.AccountReposit
 import com.example.bankmicroservice.transactionmanager.repository.LimitRepository;
 import com.example.bankmicroservice.transactionmanager.repository.TransactionRepository;
 import com.example.bankmicroservice.transactionmanager.service.LimitService;
-import com.example.bankmicroservice.transactionmanager.service.TransactionService;
 import com.example.bankmicroservice.transactionmanager.util.CurrencyShortName;
-import com.example.bankmicroservice.transactionmanager.util.ExpenseCategory;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -31,11 +27,7 @@ import java.util.List;
 public class LimitServiceImpl implements LimitService {
     private final LimitRepository limitRepository;
     private final TransactionRepository transactionRepository;
-    private final AccountRepository accountRepository;
     private final LimitMapper limitMapper;
-    private final AccountMapper accountMapper;
-    private final ModelMapper modelMapper;
-    private final BigDecimal DEFAULT_LIMIT = new BigDecimal(1000);
     private final BigDecimal zero = new BigDecimal(0);
 
     public LimitServiceImpl(LimitRepository limitRepository,
@@ -43,9 +35,6 @@ public class LimitServiceImpl implements LimitService {
                             AccountRepository accountRepository) {
         this.limitRepository = limitRepository;
         this.transactionRepository = transactionRepository;
-        this.accountRepository = accountRepository;
-        this.modelMapper = new ModelMapper();
-        this.accountMapper = AccountMapper.INSTANCE;
         this.limitMapper = LimitMapper.INSTANCE;
     }
 
@@ -58,12 +47,6 @@ public class LimitServiceImpl implements LimitService {
 
         Limit lastLimit = limitRepository
                 .findLimitByAccountAndCategoryAndIsActiveIsTrue(account.getId(), limitDto.getCategory().name());
-
-//        List<Limit> sortedLimitsByDate = limitRepository.findLimitsByAccount(account)
-//                .stream()
-//                .filter(limit -> limit.getCategory().equals(limitDto.getCategory().name()))
-//                .sorted(Comparator.comparing(Limit::getLimitDatetime))
-//                .toList();
 
         if (lastLimit!=null) {
             Limit oldLimit = lastLimit;
@@ -111,8 +94,9 @@ public class LimitServiceImpl implements LimitService {
         newLimit.setAccount(account);
         newLimit.setIsActive(true);
         limitRepository.save(newLimit);
-
-        log.info(limit.toString());
+        log.info("Создан новый лимит для категории "+
+                newLimit.getCategory()+
+                " у аккаунта с номером "+account.getAccountNumber());
 
         return newLimit;
     }
@@ -130,9 +114,15 @@ public class LimitServiceImpl implements LimitService {
         }
 
         limitRepository.updateLimitById(limit.getId(), newLimitBalance);
+        log.info("Обновлен баланс лимита для категори "+
+                limit.getCategory()+
+                " у аккаунта с номером "+
+                limit.getAccount().getAccountNumber());
     }
 
     public void markExceededTransaction(Transaction transaction) {
         transactionRepository.updateTransactionById(transaction.getId());
+        log.info("Установка флага потраченного лимита у транзакции № "+
+                transaction.getId());
     }
 }

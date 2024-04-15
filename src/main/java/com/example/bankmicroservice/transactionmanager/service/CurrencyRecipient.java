@@ -1,14 +1,10 @@
 package com.example.bankmicroservice.transactionmanager.service;
 
 import com.example.bankmicroservice.transactionmanager.dto.CurrencyDto;
-import com.example.bankmicroservice.transactionmanager.dto.TransactionDto;
-import com.example.bankmicroservice.transactionmanager.entity.Currency;
 import com.example.bankmicroservice.transactionmanager.mapper.CurrencyMapper;
 import com.example.bankmicroservice.transactionmanager.repository.CurrencyRepository;
 import com.example.bankmicroservice.transactionmanager.rest.RestClientImpl;
 import com.example.bankmicroservice.transactionmanager.rest.RestRequestBuilder;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;

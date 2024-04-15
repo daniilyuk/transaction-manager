@@ -75,6 +75,7 @@ public class TransactionServiceImpl implements TransactionService {
 
             Account account = accountRepository
                     .save(accountMapper.accountDtoToAccount(accountDto));
+            log.info("Создан новый аккаунт c номером "+account.getAccountNumber());
 
             transaction.setAccountTo(account);
         } else {
@@ -91,6 +92,7 @@ public class TransactionServiceImpl implements TransactionService {
 
             Account account = accountRepository
                     .save(accountMapper.accountDtoToAccount(accountDto));
+            log.info("Создан новый аккаунт c номером "+account.getAccountNumber());
 
             LimitDto limitDto=LimitDto.builder()
                     .limitAmount(DEFAULT_LIMIT)
@@ -123,6 +125,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 
         transactionRepository.save(transaction);
+        log.info("Сохранена транакция № "+transaction.getId());
 
         limitService.updateLimitBalance(limit, transaction, currency);
     }

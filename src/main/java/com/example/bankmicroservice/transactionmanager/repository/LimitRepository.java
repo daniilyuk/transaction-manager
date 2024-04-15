@@ -1,9 +1,6 @@
 package com.example.bankmicroservice.transactionmanager.repository;
 
-import com.example.bankmicroservice.transactionmanager.dto.LimitDto;
-import com.example.bankmicroservice.transactionmanager.entity.Account;
 import com.example.bankmicroservice.transactionmanager.entity.Limit;
-import com.example.bankmicroservice.transactionmanager.util.ExpenseCategory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
