@@ -7,6 +7,8 @@ import com.example.bankmicroservice.transactionmanager.mapper.TransactionMapper;
 import com.example.bankmicroservice.transactionmanager.service.TransactionService;
 import com.example.bankmicroservice.transactionmanager.util.CurrencyShortName;
 import com.example.bankmicroservice.transactionmanager.util.ExpenseCategory;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@Tag(name = "TransactionController")
 @Slf4j
 @RestController
 @RequestMapping(ApiConstants.PREFIX)
@@ -32,6 +35,9 @@ public class TransactionController {
         this.transactionMapper = TransactionMapper.INSTANCE;
     }
 
+    @Operation(
+            summary = "принимает и сохраняет транзакцию в базе"
+    )
     @PostMapping("/transactions")
     public ResponseEntity<HttpStatus> createTransaction(@RequestBody TransactionRequest request){
         log.info("Получена транзакция с внешнего сервиса");

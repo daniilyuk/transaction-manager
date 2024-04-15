@@ -10,6 +10,8 @@ import com.example.bankmicroservice.transactionmanager.service.AccountService;
 import com.example.bankmicroservice.transactionmanager.service.LimitService;
 import com.example.bankmicroservice.transactionmanager.service.TransactionService;
 import com.example.bankmicroservice.transactionmanager.util.ExpenseCategory;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+@Tag(name = "Client Controller")
 @Slf4j
 @RestController
 @RequestMapping(ApiConstants.PREFIX)
@@ -31,12 +35,18 @@ public class ClientController {
         this.accountService = accountService;
     }
 
+    @Operation(
+            summary = "получает список транзакций клиента, превысивших лимит"
+    )
     @GetMapping("/transactions/limit-exceeded")
     public ResponseEntity<List<TransactionResponse>> getTransactionsExceededLimit(@RequestParam String accountNumber){
         return ResponseEntity.ok(transactionService.getTransactionsExceededLimit(Long.valueOf(accountNumber)));
     }
 
 
+    @Operation(
+            summary = "устанавливает новый лимит"
+    )
     @PostMapping("/limits")
     public ResponseEntity<?> setNewLimit(@RequestBody LimitRequest limitRequest,
                                          @RequestParam String accountNumber){
@@ -53,6 +63,9 @@ public class ClientController {
         return ResponseEntity.ok("Новый лимит успешно установлен");
     }
 
+    @Operation(
+            summary = "получение всех лимитов клиента"
+    )
     @GetMapping("/limits")
     public ResponseEntity<List<LimitDto>> getAllLimits(@RequestParam String accountNumber){
         return ResponseEntity.ok(limitService.getAllLimits(Long.valueOf(accountNumber)));
