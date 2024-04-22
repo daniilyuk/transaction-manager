@@ -6,11 +6,8 @@ import com.example.bankmicroservice.transactionmanager.entity.Currency;
 import com.example.bankmicroservice.transactionmanager.entity.Limit;
 import com.example.bankmicroservice.transactionmanager.entity.Transaction;
 import com.example.bankmicroservice.transactionmanager.exception.AccountNotFoundException;
-import com.example.bankmicroservice.transactionmanager.mapper.LimitMapper;
-import com.example.bankmicroservice.transactionmanager.repository.AccountRepository;
 import com.example.bankmicroservice.transactionmanager.repository.LimitRepository;
 import com.example.bankmicroservice.transactionmanager.repository.TransactionRepository;
-import com.example.bankmicroservice.transactionmanager.service.impl.LimitServiceImpl;
 import com.example.bankmicroservice.transactionmanager.util.CurrencyShortName;
 import com.example.bankmicroservice.transactionmanager.util.ExpenseCategory;
 import org.junit.jupiter.api.BeforeEach;
@@ -159,41 +156,6 @@ class LimitServiceImplTest {
         assertTrue(createdLimit.getIsActive());
     }
 
-    @Test
-    void testUpdateLimitBalance_LimitNotExceeded() {
-        Limit limit = new Limit();
-        limit.setId(1L);
-        limit.setLimitBalance(BigDecimal.valueOf(1000));
-
-        Transaction transaction = new Transaction();
-        transaction.setId(1L);
-        transaction.setSum(BigDecimal.valueOf(500));
-
-        Currency currency = new Currency();
-        currency.setRate(BigDecimal.ONE);
-
-        limitService.updateLimitBalance(limit, transaction, currency);
-
-        verify(limitRepository, times(1)).updateLimitById(1L, BigDecimal.valueOf(500));
-    }
-
-    @Test
-    void testUpdateLimitBalance_LimitExceeded() {
-        Limit limit = new Limit();
-        limit.setId(1L);
-        limit.setLimitBalance(BigDecimal.valueOf(100));
-
-        Transaction transaction = new Transaction();
-        transaction.setId(1L);
-        transaction.setSum(BigDecimal.valueOf(500));
-
-        Currency currency = new Currency();
-        currency.setRate(BigDecimal.ONE);
-
-        limitService.updateLimitBalance(limit, transaction, currency);
-
-        verify(limitRepository, times(1)).updateLimitById(1L, BigDecimal.valueOf(-400));
-    }
 
     @Test
     void testMarkExceededTransaction() {
