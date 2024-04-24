@@ -47,7 +47,7 @@ Bank Microservice Transaction Manager is a service for managing transactions, li
 1. Install Docker on your system if it's not already installed.
 2. Run the following commands to build and run the container:
 
-docker-compose up --build
+docker-compose up
 
 ## Documentation
 
