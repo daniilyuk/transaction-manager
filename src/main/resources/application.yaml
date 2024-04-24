@@ -1,6 +1,8 @@
 spring:
   application:
     name: Bank Transaction Manager
+  jpa:
+    show-sql: true
   datasource:
     driver-class-name: org.postgresql.Driver
     username: postgres
@@ -9,7 +11,7 @@ spring:
   flyway:
     locations: "classpath:db/migration"
     enabled: true
-    baseline-on-migrate: true
+    baseline-on-migrate: false
 api:
   key: 9c906a06a172473aa45cceef364a77d1
 rest:
