@@ -6,6 +6,7 @@ COPY .mvn .mvn
 COPY pom.xml .
 COPY src src
 
+RUN dos2unix mvnw
 RUN  ./mvnw clean install -DskipTests
 
 FROM bellsoft/liberica-openjre-alpine-musl:17
