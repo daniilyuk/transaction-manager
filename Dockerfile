@@ -6,7 +6,7 @@ COPY .mvn .mvn
 COPY pom.xml .
 COPY src src
 
-RUN ./mvnw clean package -DskipTests
+RUN  ./mvnw clean package -DskipTests
 
 FROM bellsoft/liberica-openjre-alpine-musl:17
 ARG DEPENDENCY=/app/target
