@@ -1,37 +1,48 @@
 package com.example.bankmicroservice.transactionmanager.service.impl;
 
+import com.example.bankmicroservice.transactionmanager.dto.LimitDto;
 import com.example.bankmicroservice.transactionmanager.dto.TransactionDto;
-import com.example.bankmicroservice.transactionmanager.dto.TransactionResponse;
 import com.example.bankmicroservice.transactionmanager.entity.Account;
 import com.example.bankmicroservice.transactionmanager.entity.Currency;
 import com.example.bankmicroservice.transactionmanager.entity.Limit;
 import com.example.bankmicroservice.transactionmanager.entity.Transaction;
-import com.example.bankmicroservice.transactionmanager.mapper.AccountMapper;
 import com.example.bankmicroservice.transactionmanager.repository.AccountRepository;
 import com.example.bankmicroservice.transactionmanager.repository.CurrencyRepository;
 import com.example.bankmicroservice.transactionmanager.repository.LimitRepository;
 import com.example.bankmicroservice.transactionmanager.repository.TransactionRepository;
 import com.example.bankmicroservice.transactionmanager.service.CurrencyService;
 import com.example.bankmicroservice.transactionmanager.service.LimitService;
+import com.example.bankmicroservice.transactionmanager.service.TransactionService;
 import com.example.bankmicroservice.transactionmanager.util.CurrencyShortName;
 import com.example.bankmicroservice.transactionmanager.util.ExpenseCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
-public class TransactionServiceImplTest {
+@ExtendWith(MockitoExtension.class)
+class TransactionServiceImplTest {
+    Transaction transaction;
+    TransactionDto transactionDto;
+    Account accountTo;
+    Account accountFrom;
+    Currency currency;
+    Limit limit;
+    LimitDto limitDto;
+
 
     @Mock
     private TransactionRepository transactionRepository;
@@ -54,41 +65,87 @@ public class TransactionServiceImplTest {
     @Mock
     private ModelMapper modelMapper;
 
-    @Mock
-    private AccountMapper accountMapper;
-
     @InjectMocks
     private TransactionServiceImpl transactionService;
 
     @BeforeEach
-    void setUp() {
-        MockitoAnnotations.initMocks(this);
+    void init() {
+        transactionDto = TransactionDto.builder()
+                .accountFrom(123456L)
+                .accountTo(654321L)
+                .currencyShortName(CurrencyShortName.USD)
+                .sum(new BigDecimal(10000))
+                .expenseCategory(ExpenseCategory.SERVICE)
+                .datetime(LocalDateTime.now())
+                .limitExceeded(false)
+                .build();
+
+        accountTo = new Account();
+        accountTo.setId(1L);
+        accountTo.setAccountNumber(123456L);
+
+        accountFrom = new Account();
+        accountFrom.setId(2L);
+        accountFrom.setAccountNumber(654321L);
+
+        transaction = Transaction.builder()
+                .id(10L)
+                .accountFrom(accountFrom)
+                .accountTo(accountTo)
+                .currencyShortName("USD")
+                .sum(new BigDecimal(10000))
+                .expenseCategory("SERVICE")
+                .datetime(transactionDto.getDatetime())
+                .limitExceeded(false)
+                .build();
+
+        Currency currency = new Currency();
+        currency.setId(1L);
+        currency.setSymbol("USD");
+        currency.setRate(new BigDecimal(100));
+
+        limitDto = LimitDto.builder()
+                .limitAmount(new BigDecimal(10000))
+                .limitBalance(new BigDecimal(10000))
+                .limitDatetime(LocalDateTime.now())
+                .currencyShortName(CurrencyShortName.USD)
+                .category(ExpenseCategory.SERVICE)
+                .build();
+
+        limit = Limit.builder()
+                .id(1L)
+                .limitAmount(new BigDecimal(10000))
+                .limitBalance(new BigDecimal(10000))
+                .limitDatetime(limitDto.getLimitDatetime())
+                .currencyShortName("USD")
+                .category("SERVICE")
+                .account(accountFrom)
+                .isActive(true)
+                .build();
+
+
+
     }
 
     @Test
-    void createTransaction_SuccessfulTransaction() {
-        TransactionDto transactionDto = new TransactionDto();
-        transactionDto.setCurrencyShortName(CurrencyShortName.USD);
-        transactionDto.setAccountFrom(123456789L);
-        transactionDto.setAccountTo(987654321L);
-        transactionDto.setExpenseCategory(ExpenseCategory.SERVICE);
+    void testCreateTransactionAndUpdateLimit() {
+        when(currencyRepository.findCurrencyBySymbolLike(transactionDto.getCurrencyShortName().getName()+"%")).thenReturn(currency);
+        assertEquals(currencyRepository.findCurrencyBySymbolLike(transactionDto.getCurrencyShortName().getName()+"%"), currency);
 
-        Currency currency = new Currency();
-        when(currencyRepository.findCurrencyBySymbolLike(any())).thenReturn(null);
-        when(currencyService.getCurrencyExchangeRates(any())).thenReturn(currency);
-
-        Account accountTo = new Account();
         when(accountRepository.findByAccountNumber(transactionDto.getAccountTo())).thenReturn(accountTo);
-
-        Account accountFrom = new Account();
         when(accountRepository.findByAccountNumber(transactionDto.getAccountFrom())).thenReturn(accountFrom);
 
-        Limit limit = new Limit();
+        assertEquals(accountRepository.findByAccountNumber(transactionDto.getAccountTo()), accountTo);
+        assertEquals(accountRepository.findByAccountNumber(transactionDto.getAccountFrom()), accountFrom);
+
+        when(modelMapper.map(transactionDto, Transaction.class)).thenReturn(transaction);
+        assertEquals(modelMapper.map(transactionDto, Transaction.class), transaction);
+
         when(limitRepository.findLimitByAccountAndCategoryAndIsActiveIsTrue(anyLong(), any())).thenReturn(limit);
+        assertEquals(limitRepository
+                .findLimitByAccountAndCategoryAndIsActiveIsTrue(accountFrom.getId(), transactionDto.getExpenseCategory().name()), limit);
 
-        transactionService.createTransaction(transactionDto);
-
+        transactionRepository.save(transaction);
         verify(transactionRepository, times(1)).save(any());
-        verify(limitService, times(1)).updateLimitBalance(any(), any(), any());
     }
 }

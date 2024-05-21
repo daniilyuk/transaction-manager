@@ -1,5 +1,8 @@
 package com.example.bankmicroservice.transactionmanager.util;
 
+import lombok.Getter;
+
+@Getter
 public enum CurrencyShortName {
     USD("USD"),
     RUB("RUB"),
@@ -10,7 +13,4 @@ public enum CurrencyShortName {
         this.name = name;
     }
 
-    public String getName() {
-        return name;
-    }
 }

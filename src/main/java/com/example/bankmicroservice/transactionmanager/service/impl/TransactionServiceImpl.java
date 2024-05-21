@@ -35,7 +35,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final CurrencyService currencyService;
     private final ModelMapper modelMapper;
     private final AccountMapper accountMapper;
-    private final BigDecimal DEFAULT_LIMIT=new BigDecimal(1000);
+    private final BigDecimal defaultLimit =new BigDecimal(1000);
 
 
     public TransactionServiceImpl(TransactionRepository transactionRepository,
@@ -75,7 +75,7 @@ public class TransactionServiceImpl implements TransactionService {
 
             Account account = accountRepository
                     .save(accountMapper.accountDtoToAccount(accountDto));
-            log.info("Создан новый аккаунт c номером "+account.getAccountNumber());
+            log.info("Создан новый аккаунт c номером {}", account.getAccountNumber());
 
             transaction.setAccountTo(account);
         } else {
@@ -92,11 +92,11 @@ public class TransactionServiceImpl implements TransactionService {
 
             Account account = accountRepository
                     .save(accountMapper.accountDtoToAccount(accountDto));
-            log.info("Создан новый аккаунт c номером "+account.getAccountNumber());
+            log.info("Создан новый аккаунт c номером {}", account.getAccountNumber());
 
             LimitDto limitDto=LimitDto.builder()
-                    .limitAmount(DEFAULT_LIMIT)
-                    .limitBalance(DEFAULT_LIMIT)
+                    .limitAmount(defaultLimit)
+                    .limitBalance(defaultLimit)
                     .category(transactionDto.getExpenseCategory())
                     .build();
             limit = limitService.createLimit(limitDto, account);
@@ -111,8 +111,8 @@ public class TransactionServiceImpl implements TransactionService {
 
             if (limit==null){
                 LimitDto limitDto=LimitDto.builder()
-                        .limitAmount(DEFAULT_LIMIT)
-                        .limitBalance(DEFAULT_LIMIT)
+                        .limitAmount(defaultLimit)
+                        .limitBalance(defaultLimit)
                         .category(transactionDto.getExpenseCategory())
                         .build();
                 limit = limitService.createLimit(limitDto, accountFrom);
@@ -125,22 +125,20 @@ public class TransactionServiceImpl implements TransactionService {
 
 
         transactionRepository.save(transaction);
-        log.info("Сохранена транакция № "+transaction.getId());
+        log.info("Сохранена транакция № {}", transaction.getId());
 
         limitService.updateLimitBalance(limit, transaction, currency);
     }
 
     @Override
     public List<TransactionResponse> getTransactionsExceededLimit(Long accountNumber) {
-        return transactionRepository.findTransactionsWithLimitExceededAndNearestLimit()
-                .stream()
-                .filter(t->t.getAccountFrom().compareTo(accountNumber)==0)
-                .toList();
+        return transactionRepository.findTransactionsWithLimitExceededAndNearestLimit(accountNumber);
     }
+
 
     @Override
     public List<TransactionDto> getAllTransactions(Long accountNumber) {
-        return transactionRepository.findTransactionByAccountTo_AccountNumber(accountNumber)
+        return transactionRepository.findTransactionByAccountToAccountNumber(accountNumber)
                 .stream()
                 .map(transaction -> modelMapper.map(transaction, TransactionDto.class))
                 .toList();

@@ -16,22 +16,23 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query("update Transaction t set t.limitExceeded = true where t.id = :transaction_id")
     void updateTransactionById(@Param("transaction_id") Long id);
 
-    @Query("SELECT NEW com.example.bankmicroservice.transactionmanager.dto.TransactionResponse(\n" +
-            "    t.accountFrom.id,\n" +
-            "    t.accountTo.id,\n" +
-            "    t.currencyShortName,\n" +
-            "    t.sum,\n" +
-            "    t.expenseCategory,\n" +
-            "    t.datetime,\n" +
-            "    l.limitAmount,\n" +
-            "    l.limitDatetime,\n" +
-            "    l.currencyShortName\n" +
-            ")\n" +
-            "FROM Transaction t\n" +
-            "JOIN Limit l ON t.accountFrom.id = l.account.id\n" +
-            "WHERE t.limitExceeded = true")
-    List<TransactionResponse> findTransactionsWithLimitExceededAndNearestLimit();
+    @Query("""
+            SELECT NEW com.example.bankmicroservice.transactionmanager.dto.TransactionResponse(
+                t.accountFrom.id,
+                t.accountTo.id,
+                t.currencyShortName,
+                t.sum,
+                t.expenseCategory,
+                t.datetime,
+                l.limitAmount,
+                l.limitDatetime,
+                l.currencyShortName
+            )
+            FROM Transaction t
+            JOIN Limit l ON t.accountFrom.id = l.account.id
+            WHERE t.limitExceeded = true AND t.accountFrom = :accountFrom""")
+    List<TransactionResponse> findTransactionsWithLimitExceededAndNearestLimit(@Param("accountFrom") Long accountFrom);
 
 
-    List<Transaction> findTransactionByAccountTo_AccountNumber(Long accountNumber);
+    List<Transaction> findTransactionByAccountToAccountNumber(Long accountNumber);
 }

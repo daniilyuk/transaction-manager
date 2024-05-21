@@ -10,10 +10,10 @@ public class RestRequestBuilder<I, R> {
 
     private String endpointName;
     private I request;
-    private Class<R> responseType;
+    private final Class<R> responseType;
     private Map<String, String> headers;
     private Map<String, String> params;
-    private MediaType mediaType;
+    private final MediaType mediaType;
 
     private int timeout;
 

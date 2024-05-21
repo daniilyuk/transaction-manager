@@ -3,18 +3,20 @@ package com.example.bankmicroservice.transactionmanager.controller;
 import com.example.bankmicroservice.transactionmanager.constant.ApiConstants;
 import com.example.bankmicroservice.transactionmanager.dto.LimitDto;
 import com.example.bankmicroservice.transactionmanager.dto.LimitRequest;
-import com.example.bankmicroservice.transactionmanager.dto.TransactionDto;
 import com.example.bankmicroservice.transactionmanager.dto.TransactionResponse;
 import com.example.bankmicroservice.transactionmanager.entity.Account;
+import com.example.bankmicroservice.transactionmanager.exception.InvalidLimitException;
 import com.example.bankmicroservice.transactionmanager.service.AccountService;
 import com.example.bankmicroservice.transactionmanager.service.LimitService;
 import com.example.bankmicroservice.transactionmanager.service.TransactionService;
 import com.example.bankmicroservice.transactionmanager.util.ExpenseCategory;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -48,8 +50,18 @@ public class ClientController {
             summary = "устанавливает новый лимит"
     )
     @PostMapping("/limits")
-    public ResponseEntity<?> setNewLimit(@RequestBody LimitRequest limitRequest,
-                                         @RequestParam String accountNumber){
+    public ResponseEntity<?> setNewLimit(@RequestBody @Valid LimitRequest limitRequest,
+                                         @RequestParam String accountNumber,
+                                         BindingResult result){
+        if(result.hasErrors()){
+            StringBuilder builder=new StringBuilder();
+            for(FieldError fieldError:result.getFieldErrors()){
+                builder.append(fieldError.getDefaultMessage())
+                        .append("; ");
+            }
+            throw new InvalidLimitException(builder.toString());
+        }
+
         LimitDto limitDto=LimitDto.builder()
                 .limitAmount(limitRequest.getLimitAmount())
                 .limitBalance(limitRequest.getLimitAmount())
