@@ -29,7 +29,7 @@ public class CurrencyRecipient {
                 new RestRequestBuilder<String, CurrencyDto>(CurrencyDto.class)
                         .endpointName("exchange_rate")
                         .params(Map.of(
-                                "symbol", symbol+"/"+ TARGET_CURRENCY,
+                                "symbol", TARGET_CURRENCY+"/"+symbol,
                                 "interval", "1day",
                                 "format", "JSON",
                                 "previous_close", "true",
