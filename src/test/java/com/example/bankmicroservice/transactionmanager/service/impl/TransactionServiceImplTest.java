@@ -129,8 +129,8 @@ class TransactionServiceImplTest {
 
     @Test
     void testCreateTransactionAndUpdateLimit() {
-        when(currencyRepository.findCurrencyBySymbolLike(transactionDto.getCurrencyShortName().getName()+"%")).thenReturn(currency);
-        assertEquals(currencyRepository.findCurrencyBySymbolLike(transactionDto.getCurrencyShortName().getName()+"%"), currency);
+        when(currencyRepository.findCurrencyBySymbol(transactionDto.getCurrencyShortName().getName()+"%")).thenReturn(currency);
+        assertEquals(currencyRepository.findCurrencyBySymbol(transactionDto.getCurrencyShortName().getName()+"%"), currency);
 
         when(accountRepository.findByAccountNumber(transactionDto.getAccountTo())).thenReturn(accountTo);
         when(accountRepository.findByAccountNumber(transactionDto.getAccountFrom())).thenReturn(accountFrom);

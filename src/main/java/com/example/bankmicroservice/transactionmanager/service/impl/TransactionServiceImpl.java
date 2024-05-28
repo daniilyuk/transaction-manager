@@ -57,8 +57,9 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional
     public void createTransaction(TransactionDto transactionDto){
         Currency currency = currencyRepository
-                .findCurrencyBySymbolLike(transactionDto.getCurrencyShortName().getName()+"%");
+                .findCurrencyBySymbol(transactionDto.getCurrencyShortName().getName());
         if(currency==null){
+            log.info("Нет валюты в базе. Получаем с https://twelvedata.com");
             currency = currencyService.getCurrencyExchangeRates(transactionDto.getCurrencyShortName().getName());
         }
 
