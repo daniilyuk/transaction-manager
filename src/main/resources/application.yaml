@@ -12,6 +12,11 @@ spring:
     locations: "classpath:db/migration"
     enabled: true
     baseline-on-migrate: false
+  jmx:
+    enabled: true
+  cache:
+    type: simple
+
 api:
   key: 9c906a06a172473aa45cceef364a77d1
 rest:
@@ -20,4 +25,17 @@ rest:
       uri: https://api.twelvedata.com/time_series
     - name: exchange_rate
       uri: https://api.twelvedata.com/exchange_rate
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+  endpoint:
+    health:
+      show-details: always
+
+
+
 
